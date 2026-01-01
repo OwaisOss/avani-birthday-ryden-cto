@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   IconHeart,
   IconUsers,
@@ -14,6 +14,14 @@ import {
 export default function LeadershipLetter() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const qualities = [
     {
@@ -62,9 +70,9 @@ export default function LeadershipLetter() {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-20 px-6 bg-linear-to-br from-[#fff5f9] via-[#ffe8f0] to-[#ffd4e5] relative overflow-hidden">
-      {/* Animated background */}
+      {/* Animated background - reduced for mobile */}
       <div className="absolute inset-0">
-        {[...Array(15)].map((_, i) => (
+        {[...Array(isMobile ? 5 : 15)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-32 h-32 rounded-full"

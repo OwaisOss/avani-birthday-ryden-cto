@@ -1,17 +1,38 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CoverLetter from "@/components/CoverLetter";
-import GratitudeLetter from "@/components/GratitudeLetter";
-import LeadershipLetter from "@/components/LeadershipLetter";
-import VisionLetter from "@/components/VisionLetter";
-import FinalWish from "@/components/FinalWish";
+
+// Lazy load components for better performance
+const GratitudeLetter = lazy(() => import("@/components/GratitudeLetter"));
+const LeadershipLetter = lazy(() => import("@/components/LeadershipLetter"));
+const VisionLetter = lazy(() => import("@/components/VisionLetter"));
+const FinalWish = lazy(() => import("@/components/FinalWish"));
 
 export default function Home() {
   const [showContent, setShowContent] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Detect user's motion preference and mobile device
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mediaQuery.matches || window.innerWidth < 768);
+    
+    const handleChange = () => {
+      setReducedMotion(mediaQuery.matches || window.innerWidth < 768);
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    window.addEventListener('resize', handleChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+      window.removeEventListener('resize', handleChange);
+    };
+  }, []);
 
   useEffect(() => {
     if (!showContent) return;
@@ -51,30 +72,32 @@ export default function Home() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: reducedMotion ? 0.3 : 0.8 }}
         className="overflow-x-hidden"
       >
         {/* Smooth scroll container */}
-        <div className="snap-y snap-mandatory h-screen overflow-y-scroll scroll-smooth">
-          {/* Section 1: Gratitude Letter */}
-          <section className="snap-start">
-            <GratitudeLetter />
-          </section>
+        <div className="snap-y snap-mandatory h-screen overflow-y-scroll scroll-smooth motion-safe">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#ffeef8]"><div className="text-[#ff6b9d] text-xl">Loading...</div></div>}>
+            {/* Section 1: Gratitude Letter */}
+            <section className="snap-start">
+              <GratitudeLetter />
+            </section>
 
-          {/* Section 2: Leadership Letter */}
-          <section className="snap-start">
-            <LeadershipLetter />
-          </section>
+            {/* Section 2: Leadership Letter */}
+            <section className="snap-start">
+              <LeadershipLetter />
+            </section>
 
-          {/* Section 3: Vision Letter */}
-          <section className="snap-start">
-            <VisionLetter />
-          </section>
+            {/* Section 3: Vision Letter */}
+            <section className="snap-start">
+              <VisionLetter />
+            </section>
 
-          {/* Section 4: Final Wish */}
-          <section className="snap-start">
-            <FinalWish />
-          </section>
+            {/* Section 4: Final Wish */}
+            <section className="snap-start">
+              <FinalWish />
+            </section>
+          </Suspense>
         </div>
 
         {/* Scroll indicator */}

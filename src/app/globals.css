@@ -106,6 +106,32 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Performance optimizations for mobile */
+@media (max-width: 768px) {
+  * {
+    /* Reduce motion on mobile for better performance */
+    animation-duration: 0.5s !important;
+  }
+  
+  /* Optimize rendering */
+  .motion-div,
+  [class*="motion"] {
+    will-change: auto !important;
+  }
+  
+  /* Reduce blur effects on mobile */
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+  
+  .blur-3xl,
+  .blur-2xl {
+    filter: blur(20px) !important;
+  }
+}
+
 /* Elegant hover effects */
 .hover-lift {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -154,6 +180,28 @@ body {
 button, a {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Hardware acceleration for better performance */
+.motion-safe {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* Optimize animations */
+@keyframes optimized-fade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 /* Backdrop filter support */

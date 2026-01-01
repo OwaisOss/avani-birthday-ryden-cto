@@ -11,32 +11,45 @@ interface CoverLetterProps {
 
 export default function CoverLetter({ onOpen }: CoverLetterProps) {
   const [isOpening, setIsOpening] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    // Detect mobile device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
     if (!cardRef.current || !buttonRef.current) return;
 
-    // Entrance animation
+    // Simplified entrance animation for mobile
     gsap.from(cardRef.current, {
-      scale: 0.5,
+      scale: isMobile ? 0.8 : 0.5,
       opacity: 0,
-      rotateY: -180,
-      duration: 1.2,
+      rotateY: isMobile ? 0 : -180,
+      duration: isMobile ? 0.8 : 1.2,
       ease: "back.out(1.7)",
       delay: 0.3,
     });
 
-    // Button pulse animation
-    gsap.to(buttonRef.current, {
-      scale: 1.05,
-      boxShadow: "0 0 30px rgba(255, 107, 157, 0.6)",
-      duration: 1,
-      repeat: -1,
-      yoyo: true,
-      ease: "power1.inOut",
-    });
-  }, []);
+    // Simplified button pulse for mobile
+    if (!isMobile) {
+      gsap.to(buttonRef.current, {
+        scale: 1.05,
+        boxShadow: "0 0 30px rgba(255, 107, 157, 0.6)",
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut",
+      });
+    }
+  }, [isMobile]);
 
   const handleOpen = () => {
     setIsOpening(true);
@@ -71,9 +84,9 @@ export default function CoverLetter({ onOpen }: CoverLetterProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-linear-to-br from-[#ff6b9d] via-[#c44569] to-[#a8336a] animate-gradient">
-      {/* Animated background elements */}
+      {/* Animated background elements - reduced for mobile */}
       <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(isMobile ? 8 : 20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-white/20 rounded-full"

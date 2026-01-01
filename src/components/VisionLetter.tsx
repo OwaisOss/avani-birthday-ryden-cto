@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   IconRocket,
   IconTarget,
@@ -12,6 +12,7 @@ import {
 export default function VisionLetter() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [isMobile, setIsMobile] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -19,6 +20,13 @@ export default function VisionLetter() {
 
   const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const commitments = [
     {
@@ -43,22 +51,26 @@ export default function VisionLetter() {
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-linear-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] animate-gradient" />
 
-      {/* Parallax background elements */}
-      <motion.div
-        style={{ y, opacity }}
-        className="absolute top-1/4 left-10 w-96 h-96 bg-[#ff6b9d]/20 rounded-full blur-3xl"
-      />
-      <motion.div
-        style={{
-          y: useTransform(scrollYProgress, [0, 1], [-100, 100]),
-          opacity,
-        }}
-        className="absolute bottom-1/4 right-10 w-96 h-96 bg-[#c44569]/20 rounded-full blur-3xl"
-      />
+      {/* Parallax background elements - disabled on mobile */}
+      {!isMobile && (
+        <>
+          <motion.div
+            style={{ y, opacity }}
+            className="absolute top-1/4 left-10 w-96 h-96 bg-[#ff6b9d]/20 rounded-full blur-3xl"
+          />
+          <motion.div
+            style={{
+              y: useTransform(scrollYProgress, [0, 1], [-100, 100]),
+              opacity,
+            }}
+            className="absolute bottom-1/4 right-10 w-96 h-96 bg-[#c44569]/20 rounded-full blur-3xl"
+          />
+        </>
+      )}
 
-      {/* Floating particles */}
+      {/* Floating particles - reduced for mobile */}
       <div className="absolute inset-0">
-        {[...Array(30)].map((_, i) => (
+        {[...Array(isMobile ? 10 : 30)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-white/30 rounded-full"

@@ -2,15 +2,24 @@
 
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { IconSparkles, IconHeart, IconStar } from "@tabler/icons-react";
 
 export default function FinalWish() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Particle animation
-  const particles = Array.from({ length: 50 }, (_, i) => ({
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Particle animation - reduced count for mobile
+  const particleCount = isMobile ? 15 : 50;
+  const particles = Array.from({ length: particleCount }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     delay: Math.random() * 3,
@@ -47,8 +56,8 @@ export default function FinalWish() {
         />
       ))}
 
-      {/* Sparkle icons floating */}
-      {[...Array(10)].map((_, i) => (
+      {/* Sparkle icons floating - reduced for mobile */}
+      {[...Array(isMobile ? 4 : 10)].map((_, i) => (
         <motion.div
           key={`sparkle-${i}`}
           className="absolute text-white/20"
@@ -104,14 +113,16 @@ export default function FinalWish() {
             <div className="absolute inset-0 bg-white/30 rounded-full blur-3xl scale-110 animate-pulse" />
             <div className="absolute inset-0 bg-[#ffa3bb]/40 rounded-full blur-2xl scale-105" />
 
-            {/* Rotating ring */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 -m-4"
-            >
-              <div className="w-full h-full rounded-full border-4 border-dashed border-white/30" />
-            </motion.div>
+            {/* Rotating ring - disabled on mobile for performance */}
+            {!isMobile && (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 -m-4"
+              >
+                <div className="w-full h-full rounded-full border-4 border-dashed border-white/30" />
+              </motion.div>
+            )}
 
             {/* Photo frame */}
             <div className="relative w-80 h-80 md:w-96 md:h-96 rounded-full overflow-hidden shadow-2xl border-8 border-white/90 backdrop-blur-xl">

@@ -1,33 +1,45 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { IconHeart, IconSparkles } from "@tabler/icons-react";
 
 export default function GratitudeLetter() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center py-20 px-6 bg-linear-to-br from-[#ffeef8] via-[#fff0f5] to-[#ffe4f1] relative overflow-hidden">
-      {/* Animated background shapes */}
+      {/* Animated background shapes - simplified for mobile */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-          }}
-          transition={{ duration: 20, repeat: Infinity }}
-          className="absolute -top-20 -right-20 w-96 h-96 bg-[#ff6b9d]/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-          }}
-          transition={{ duration: 25, repeat: Infinity }}
-          className="absolute -bottom-20 -left-20 w-96 h-96 bg-[#c44569]/10 rounded-full blur-3xl"
-        />
+        {!isMobile && (
+          <>
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [0, 90, 0],
+              }}
+              transition={{ duration: 20, repeat: Infinity }}
+              className="absolute -top-20 -right-20 w-96 h-96 bg-[#ff6b9d]/10 rounded-full blur-3xl"
+            />
+            <motion.div
+              animate={{
+                scale: [1, 1.3, 1],
+                rotate: [0, -90, 0],
+              }}
+              transition={{ duration: 25, repeat: Infinity }}
+              className="absolute -bottom-20 -left-20 w-96 h-96 bg-[#c44569]/10 rounded-full blur-3xl"
+            />
+          </>
+        )}
       </div>
 
       <motion.div
